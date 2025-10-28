@@ -1,4 +1,4 @@
-#include "server.h"
+#include "../include/network.h"
 
 void send_file(int client_fd, const char *path, const char *content_type)
 {
