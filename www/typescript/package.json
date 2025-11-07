@@ -5,7 +5,9 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/jquery": "^3.5.33",
-    "esbuild": "0.25.11"
+    "@types/jquery": "^3.5.33"
+  },
+  "scripts": {
+    "build": "esbuild *.ts --bundle --minify --sourcemap --target=firefox57,safari11 --outdir=../javascript"
   }
 }

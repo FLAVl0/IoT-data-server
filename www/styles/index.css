@@ -1,0 +1,74 @@
+body {
+	margin: 0;
+	padding: 0 40px;
+	/* horizontal padding for side space */
+	background: #f0f2f5;
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	/* vertical layout */
+	justify-content: center;
+	align-items: center;
+	gap: 40px;
+	/* vertical space between boxes */
+	width: 100%;
+	max-width: 900px;
+	/* limit main container width */
+	margin: auto;
+}
+
+#main {
+	width: 800px;
+	/* bigger chart box */
+	height: 500px;
+}
+
+.ledSwitch {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	text-align: center;
+	font-size: 20px;
+}
+
+.ledSwitch button {
+	margin: 20px 10px;
+	padding: 10px 20px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.ledSwitch button:hover {
+	background-color: #ddd;
+	border: 0px solid #000;
+}
+
+.ledSwitch button:active {
+	background-color: #bbb;
+	border: 0px solid #000;
+}
+
+.box {
+	background: #fafafa;
+	border-radius: 14px;
+	padding: 24px 24px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	width: 100%;
+	max-width: 800px;
+	min-width: 320px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#ledStatus {
+	font-size: 18px;
+	margin-top: 10px;
+	font-weight: bold;
+}

@@ -6,12 +6,22 @@
 	<title>LeTech IoT Data Server</title>
 	<link rel="stylesheet" href="../styles/index.css">
 	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script type="module" src="../javascript/index.js" defer></script>
 </head>
 <body>
 	<div class="main">
-		<!-- ECharts input -->
-		<div id="main" style="width: 600px; height: 400px;"></div>
+		<div class="box ledSwitch">
+			Toggle LED State:
+			<div id="ledStatus">
+				Unknown
+			</div>
+			<div>
+				<button id="onButton">ON</button>
+				<button id="offButton">OFF</button>
+			</div>
+		</div>
+		<div class="box" id="main">
+			<!-- ECharts input -->
+		</div>
 	</div>
 </body>
