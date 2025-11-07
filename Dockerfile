@@ -1,3 +1,12 @@
-FROM alpine:3.22
+# Simple Dockerfile to set up a test environment using Debian stable slim
 
-RUN apk add --no-cache gcc musl-dev make sqlite-dev
+FROM debian:stable-slim
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+		gcc \
+		make \
+		libsqlite3-dev \
+		libbluetooth-dev \
+		libdbus-1-dev && \
+	rm -rf /var/lib/apt/lists/*
