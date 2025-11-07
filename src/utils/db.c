@@ -8,13 +8,18 @@ void init_db()
 	{
 		char *sql, *err_msg = 0;
 
-		// Create the basic tables if they do not exist
+		// - - - Create the basic tables if they do not exist - - - //
 
 		// Table for registered IoT devices
+
+		// device_id (TEXT PRIMARY KEY) - Unique identifier for each device
+		// data_id (INTEGER) - Identifier for the type of data sent by the device
+		// data_designation (TEXT) - Description of the data type
 		sql =
 			"CREATE TABLE IF NOT EXISTS devices ("
-			"device_ip TEXT NOT NULL,"
-			"device_id TEXT PRIMARY KEY"
+			"device_id TEXT PRIMARY KEY,"
+			"data_id INTEGER,"
+			"data_designation TEXT"
 			");";
 		if (sqlite3_exec(database, sql, 0, 0, &err_msg) != SQLITE_OK)
 		{
@@ -26,19 +31,18 @@ void init_db()
 			err_msg = 0;
 		}
 
-		// Table for data from IoT devices which includes:
+		// Table for data
+
+		// timestamp (DATETIME DEFAULT CURRENT_TIMESTAMP)
 		// device_id (foreign key)
 		// temperature (REAL)
 		// humidity (REAL)
-		// timestamp (DATETIME DEFAULT CURRENT_TIMESTAMP)
-
 		sql =
 			"CREATE TABLE IF NOT EXISTS data ("
-			"device_id TEXT,"
-			"temperature REAL,"
-			"humidity REAL,"
 			"ts DATETIME DEFAULT CURRENT_TIMESTAMP,"
-			"FOREIGN KEY(device_id) REFERENCES devices(device_id)"
+			"device_id TEXT PRIMARY KEY,"
+			"data_id INTEGER,"
+			"value REAL"
 			");";
 		if (sqlite3_exec(database, sql, 0, 0, &err_msg) != SQLITE_OK)
 		{
@@ -54,21 +58,21 @@ void init_db()
 	sqlite3_close(database);
 }
 
-void add_device(sqlite3 *db, const char *device_ip)
+/*
+ * Function to add a new device to the database
+ * Parameters:
+ *  - db: Pointer to the SQLite3 database connection
+ * 	- device_id: Unique identifier for the device
+*/
+void add_device(sqlite3 *db, const char *device_id)
 {
 	char *err_msg = 0;
 	char *sql;
 
-	// Insert a new device with a unique device_id
-	uuid_t binuuid;
-	uuid_generate(binuuid);
-	char device_id[37];
-	uuid_unparse(binuuid, device_id);
-
 	sql = sqlite3_mprintf(
-		"INSERT INTO devices (device_ip, device_id) "
-		"VALUES ('%q', '%q');",
-		device_ip, device_id);
+		"INSERT INTO devices (device_id) "
+		"VALUES ('%q');",
+		device_id);
 	if (sql == NULL)
 	{
 		fprintf(stderr, "Failed to allocate memory for SQL statement\n");
@@ -87,6 +91,12 @@ void add_device(sqlite3 *db, const char *device_ip)
 	sqlite3_free(sql);
 }
 
+/*
+ * Function to remove a device from the database
+ * Parameters:
+ *  - db: Pointer to the SQLite3 database connection
+ * 	- device_id: Unique identifier for the device
+*/
 void remove_device(sqlite3 *db, const char *device_id)
 {
 	char *err_msg = 0;
@@ -114,6 +124,12 @@ void remove_device(sqlite3 *db, const char *device_id)
 	sqlite3_free(sql);
 }
 
+/*
+ * Function to open a connection to the database
+ * Parameters:
+ *  - db: Pointer to the SQLite3 database connection pointer
+ * 	- db_name: Name of the database file
+*/
 void open_db(sqlite3 **db, const char *db_name)
 {
 	if (sqlite3_open(db_name, db) != SQLITE_OK)
@@ -124,6 +140,11 @@ void open_db(sqlite3 **db, const char *db_name)
 	}
 }
 
+/*
+ * Function to close the connection to the database
+ * Parameters:
+ *  - db: Pointer to the SQLite3 database connection
+*/
 void close_db(sqlite3 *db)
 {
 	if (db)

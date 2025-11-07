@@ -9,10 +9,6 @@
 
 #include <sqlite3.h>
 
-// Unique device ID generation helper
-
-#include <uuid/uuid.h>
-
 // Function declarations for database initialization and device management
 
 void init_db();

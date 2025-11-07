@@ -17,8 +17,8 @@ void signal_handler(int signum)
 // and calls the signal handler to terminate the program.
 void safe_close_sock(struct sock_fd *sockets, char *msg)
 {
-	int *udp_socket = sockets->udp_socket;
-	int *tcp_socket = sockets->tcp_socket;
+	int udp_socket = sockets->udp_socket;
+	int tcp_socket = sockets->tcp_socket;
 
 	if (udp_socket >= 0)
 		close(udp_socket);

@@ -76,7 +76,7 @@ int main(void)
 
 	if (bind(tcp_socket, (struct sockaddr *)&tcp_addr, sizeof(tcp_addr)) < 0)
 	{
-		safe_close(&sockets, "Bind failed");
+		safe_close_sock(&sockets, "Bind failed");
 	}
 
 	if (listen(tcp_socket, 10) < 0)
@@ -84,7 +84,7 @@ int main(void)
 		safe_close_listen(&sockets, "Listen failed");
 	}
 
-	#ifdef __linux__
+#ifdef __linux__
 
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1)
@@ -120,10 +120,12 @@ int main(void)
 			if (events[n].data.fd == tcp_socket)
 			{
 				int client_fd = accept(tcp_socket, NULL, NULL);
-				
+
 				if (client_fd >= 0)
 				{
-					event.events = EPOLLIN | EPOLLET;
+					// Use level-triggered reads for simplicity (EPOLLIN).
+					// If you want EPOLLET you must set client_fd non-blocking and read until EAGAIN.
+					event.events = EPOLLIN;
 					event.data.fd = client_fd;
 					if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event) == -1)
 					{
@@ -137,7 +139,7 @@ int main(void)
 				char buffer[1024];
 				struct sockaddr_in client_addr;
 				socklen_t addrlen = sizeof(client_addr);
-				
+
 				ssize_t recvd = recvfrom(udp_socket, buffer, sizeof(buffer) - 1, 0, (struct sockaddr *)&client_addr, &addrlen);
 
 				if (recvd > 0)
@@ -148,24 +150,21 @@ int main(void)
 			}
 			else
 			{
-				char buffer[1024];
-				ssize_t recvd = read(events[n].data.fd, buffer, sizeof(buffer) - 1);
+				// Hand off the client socket to the HTTP handlerient socket to the HTTP handler
+				int client_fd = events[n].data.fd;
+				// Remove from epoll; handler manages the connection/closing				// Remove from epoll; handler manages the connection/closing
+				epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, NULL);
 
-				if (recvd <= 0)
-				{
-					close(events[n].data.fd);
-					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[n].data.fd, NULL);
-				}
-				else
-				{
-					buffer[recvd] = '\0';
-					printf("Received TCP message: %s\n", buffer);
-				}
+				// handle_client will read the request and send responses the request and send responses
+				handle_client(client_fd);
+
+				// Ensure socket is closed if handler didn't close itnsure socket is closed if handler didn't close it
+				close(client_fd);
 			}
 		}
 	}
 
-	#endif
+#endif
 
 	return 0;
 }
